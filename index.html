@@ -13,7 +13,7 @@
     <header class="page-header">
       <p class="eyebrow">Vállalkozói kalkulátor</p>
       <h1>Bankkártya-elfogadás költségei</h1>
-      <p class="intro">Havi forgalom alapján becsüld meg az OFSZ és a Fizetési Pont díjait.</p>
+      <p class="intro">Havi forgalom alapján becsüld meg a banki és terminálszolgáltatói díjakat.</p>
     </header>
 
     <section class="panel settings" aria-labelledby="settings-title">
@@ -21,14 +21,14 @@
       <div class="settings-grid">
         <label>
           Banki díjszabás
-          <select id="bank-provider" aria-describedby="provider-note"></select>
+          <select id="bank-provider" aria-describedby="provider-messages"></select>
         </label>
         <label>
           POS-szolgáltató
           <select id="terminal-provider"></select>
         </label>
       </div>
-      <p class="note" id="provider-note">Jelenleg az OFSZ és a Fizetési Pont díjszabása érhető el. A kalkuláció minden tranzakcióra bankközi jutalékot számol.</p>
+      <div class="provider-messages" id="provider-messages" aria-live="polite"></div>
     </section>
 
     <section class="panel" aria-labelledby="volume-title">
@@ -51,7 +51,7 @@
           <tbody id="card-inputs"></tbody>
         </table>
       </div>
-      <p class="disclaimer">Az OFSZ díjtáblázatának egyedi kártyatípusai szerepelnek. A bankközi díjaknál a más bank által kibocsátott kártyák díjai érvényesülnek (worst case).</p>
+      <p class="disclaimer">A kalkuláció a kiválasztott bank díjszabásához tartozó feltevéseket és a megadott kártyatípusokat alkalmazza. A havi tranzakciószámnak és forgalomnak kártyatípusonként kell megadva lennie.</p>
     </section>
 
     <p class="error-message" id="calculation-error" role="alert" hidden></p>
@@ -82,7 +82,7 @@
                 <th scope="col">Kártyatípus</th>
                 <th scope="col">Kereskedői díj</th>
                 <th scope="col">Bankközi jutalék</th>
-                <th scope="col">Kártyatársasági díj</th>
+                <th scope="col">Rendszerdíj</th>
                 <th scope="col">Összesen</th>
               </tr>
             </thead>

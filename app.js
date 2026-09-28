@@ -12,6 +12,7 @@
   const bankResultsBody = document.getElementById("bank-results");
   const errorMessage = document.getElementById("calculation-error");
   const results = document.getElementById("results");
+  const providerMessages = document.getElementById("provider-messages");
 
   function formatFt(amount) {
     return `${currency.format(amount)} Ft`;
@@ -28,7 +29,9 @@
     for (const [id, item] of Object.entries(entries)) {
       const option = document.createElement("option");
       option.value = id;
-      option.textContent = item.name;
+      option.textContent = item.pricingModel
+        ? `${item.name} — ${item.pricingModel}`
+        : item.name;
       select.append(option);
     }
   }
@@ -91,9 +94,12 @@
 
   function calculateBank(bank, volumes) {
     const rows = volumes.map(({ card, count, turnover }) => {
-      const merchantFee = Math.round(turnover * bank.merchantRate);
+      const merchantRate = card.merchantRate ?? bank.merchantRate;
+      const merchantFee = Math.round(turnover * merchantRate);
       const interchangeFee = Math.round(turnover * card.interchangeRate);
-      const schemeFee = Math.round(turnover * bank.schemeRate + count * bank.schemeFixed);
+      const schemeRate = card.schemeRate ?? bank.schemeRate;
+      const schemeFixed = card.schemeFixed ?? bank.schemeFixed;
+      const schemeFee = Math.round(turnover * schemeRate + count * schemeFixed);
       return {
         name: card.name,
         merchantFee,
@@ -155,6 +161,17 @@
     document.getElementById("card-fee").textContent = formatFt(bankResult.annualCardFee);
   }
 
+  function renderProviderMessages(bank, terminal) {
+    providerMessages.replaceChildren();
+    for (const message of [...(bank.messages ?? []), ...(terminal.messages ?? [])]) {
+      const element = document.createElement("p");
+      element.className = "provider-message";
+      element.dataset.type = message.type;
+      element.textContent = message.text;
+      providerMessages.append(element);
+    }
+  }
+
   function update() {
     try {
       const bank = tariffs.banks[bankSelect.value];
@@ -170,6 +187,7 @@
       const annualTotal = monthlyTotal * 12 + bankResult.annualCardFee;
 
       renderBankResults(bankResult);
+      renderProviderMessages(bank, terminal);
       document.getElementById("terminal-variable-net").textContent = formatFt(terminalResult.variableNet);
       document.getElementById("terminal-variable-vat").textContent = formatFt(terminalResult.variableVat);
       document.getElementById("terminal-fixed-net").textContent = formatFt(terminalResult.fixedNet);

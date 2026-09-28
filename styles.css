@@ -114,6 +114,29 @@ input:focus {
   font-size: 12px;
 }
 
+.provider-messages {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.provider-message {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid #4b8bba;
+  border-radius: 4px;
+  background: #f0f6fa;
+  color: #38576b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.provider-message[data-type="warn"] {
+  border-left-color: #d39631;
+  background: #fff8e9;
+  color: #70521d;
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;
