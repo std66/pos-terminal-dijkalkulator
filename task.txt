@@ -1,0 +1,134 @@
+# A feladat
+Egy senior szoftverfejlesztő vagy, akinek egy bankkártya-elfogadási díjkalkulátort kell megvalósítani az alább definiált díjazási modell szerint.
+
+## Tech stack
+Webszerver nélkül futtatható (`file://` protokollon is működnie kell), kliens-oldalon működni képes sima HTML5 fájl, valamint vanilla JavaScript. A UI design-t minimálisra és letisztultra kell venni, csak desktop UI-t építünk.
+A JS és CSS külön fájlok legyenek.
+További függőségek nem használhatóak.
+
+## Az üzleti modell
+Egy vállalkozásnak szüksége van
+1. egy vállalkozói bankszámlára, amelyet valamely bank vezet
+2. egy, a számlához tartozó bankkártyára
+3. egy POS-terminálra
+
+### A bankszámla díjai
+1. Havi számlavezetési díj
+2. Éves kártyadíj
+3. A bankkártyás vásárlások díjszabása különféle modellek szerint (Interchange++, Blended, Interchange Pass-Through)
+
+### A bankkártyás vásárlások díjszabási rendszere
+1. Interchange++ (IC++): A legtöbb felmerülő díjat tételesen jeleníti meg, ezáltal bár bonyolultnak tűnik elsőre, a legjobb betekintést nyújtja a konkrét fizetendő tételekbe. A szolgáltató teljesen megnyitja a lapjait: a tranzakciónként változó bankközi jutalékot (Interchange) és a kártyatársasági díjat (első +) tiszta önköltségi áron továbbhárítja rád, és kizárólag a saját, rögzített árrését (második +, pl. 0,25% + 10 Ft) teszi hozzá.
+2. Blended (egybeszámított / flat-rate): A szolgáltató egyetlen fix százalékot mond (például "minden fizetés után 1,5%-ot vonunk le"), amelyben az összes költségelem egyben benne van.
+3. Unbundled / Interchange Pass-Through: Ez egy átmenet a kettő között. A bank a számlán átlátható módon, külön tételekként jeleníti meg a bankközi jutalékot és a kártyatársasági díjat (tehát nem Blended), viszont a saját fizetendő részét nem egy piaci alapon mozgó pici árrésként (mint az IC++), hanem egy magas, fix kereskedői díjként (pl. 1,2%) határozza meg. Emiatt a szerkezete átláthatóbb a Blendednél, de a végső költsége a kereskedő számára hasonlóan magas lehet.
+
+A bankok a különféle bankkártya-típusokra eltérő díjazást adnak meg, amely függ a kártyatársaságtól (VISA, MasterCard, Maestro, American Express), a kártya típusától (lakossági vagy üzleti, betéti vagy hitelkártya), valamint
+bankon belül vagy bankok között történik-e a tranzakció.
+
+### Példa kalkuláció
+A vásárló 59270 Ft-ot fizet VISA lakossági betéti kártyával
+
+1. Blended (egybeszámított) modell (pl. fix 1,5%-os díj)
+- Tranzakció ára: 59270 Ft * 0,015
+- Levonás a bank részéről: 889 Ft (1,50%)
+- A kereskedőnél marad: 58381 Ft
+2. Unbundled / Pass-Through modell
+- Kereskedői díj (1,2%): 711 Ft
+- Bankközi jutalék (0,2%): 119 Ft
+- Kártyatársasági díj (18 Ft + 0,55%): 344 Ft
+- Levonás a bank részéről: 1174 Ft (1,98%)
+A kereskedőnél marad: 58096 Ft
+3. Interchange++ (IC++) modell (pl. 0,3% + 10 Ft szolgáltatói árréssel)
+Bankközi jutalék (0,2%): 119 Ft
+Kártyatársasági díj (18 Ft + 0,55%): 344 Ft
+Szolgáltatói árrés (0,3% + 10 Ft): 188 Ft
+Levonás a bank részéről: 651 Ft (1,10%)
+A kereskedőnél marad: 58619 Ft
+
+### Az OFSZ (Országos Fizetési Szolgáltató) díjrendszere
+
+| O.F.SZ. Zrt. által kibocsátott kártyák | Kereskedői díj | Bankközi jutalék | Kártyatársági díj |
+| :--- | :---: | :---: | :---: |
+| MasterCard lakossági betéti kártya | 1,2% | - | 18 Ft + 0,55% |
+| MasterCard üzleti betéti kártya | 1,2% | - | 18 Ft + 0,55% |
+| VISA lakossági betéti kártya | 1,2% | - | 18 Ft + 0,55% |
+| VISA üzleti betéti kártya | 1,2% | - | 18 Ft + 0,55% |
+
+| Más bank által kibocsátott kártyák | Kereskedői díj | Bankközi jutalék | Kártyatársági díj |
+| :--- | :---: | :---: | :---: |
+| MasterCard lakossági betéti kártya | 1,2% | 0,2% | 18 Ft + 0,55% |
+| MasterCard lakossági hitelkártya | 1,2% | 0,3% | 18 Ft + 0,55% |
+| MasterCard üzleti hitelkártya | 1,2% | 1,75% | 18 Ft + 0,55% |
+| MasterCard üzleti betéti kártya | 1,2% | 1,25% | 18 Ft + 0,55% |
+| Maestro kártya | 1,2% | 0,2% | 18 Ft + 0,55% |
+| Visa lakossági betéti kártya | 1,2% | 0,2% | 18 Ft + 0,55% |
+| Visa lakossági hitelkártya | 1,2% | 0,3% | 18 Ft + 0,55% |
+| Visa üzleti hitelkártya | 1,2% | 1,35% | 18 Ft + 0,55% |
+| Visa üzleti betéti kártya | 1,2% | 1,35% | 18 Ft + 0,55% |
+| V PAY | 1,2% | 0,2% | 18 Ft + 0,55% |
+
+Ezek a díjak tárgyi adómentesek (nem kell áfát fizetni utánuk).
+További díjtételek szerepelhetnek a bankkártya kibocsátásának régiója alapján is. Eltérő díjak vonatkozhatnak az EEA-ban és azon kívüli gazdasági területeken kibocsátott bankkártyákra.
+Az EEA területén kibocsátott lakossági betéti- és hitelkártyák bankközi jutalékai a dokumentum írásának időpontjában az EU által maximalizálva vannak (0,2% betéti kártyára, 0,3% hitelkártyára).
+
+A példában a vásárlónk a videókártyáját **VISA lakossági betéti kártyával** fizeti ki az **MBH Banknál** vezetett számláján (ami egy másik bank, tehát van bankközi jutalék). Ezek alapján az alábbi díjak lesznek levonva a kifizetett összegből. A százalékok mindig az eredeti kifizetett összegből számolódnak ki:
+- **1,2% kereskedői díj**: 59270 Ft * 0,012 = 711,24 Ft
+- **0,2% bankközi jutalék**: 59270 Ft * 0,002 = 118,54 Ft
+- **18 Ft + 0,55% kártyatársasági díj**: 18 Ft + (59.270 Ft * 0,0055) = 343,985 Ft
+
+Ezeket a tételeket összeadjuk és kerekítjük: 1173,765 Ft, kerekítve **1174 Ft**.
+
+### A bankkártya-terminál díjazása
+
+A bankkártyás fizetési szolgáltató kétféle díjat számít fel, mivel két feladata van: üzemelteti és bérbe adja a POS-terminált, valamint lebonyolítja a kártyatársasággal az egyes tranzakciókat.
+1. Minden egyes tranzakciónak díja van, amely lehet fix, arányos a vásárlás mértékével, vagy hibrid (fix + arányos díj összege).
+2. A POS-terminál üzemeltetésének és bérbeadásának (használatának), valamint infrastruktúrájának (mobilinternet-hozzáférés) díja.
+
+#### A tranzakciónkénti díj
+
+Miután megtudtuk, hogy a vásárló által kifizetett 59270 Ft-ból az első kör díjait kifizetve már csak 58096 Ft maradt meg nekünk, ideje, hogy még kevesebbet tarthassunk meg belőle, hála a POS-terminál díjainak. Hogy mennyivel?
+
+A POS-terminál díjait a bankkártyás fizetési szolgáltató hirdetménye írja le. Ez már barátibb:
+
+| Terminálonként vagy tranzakciónként fizetendő díjak | |
+| :--- | :---: |
+| Alapdíj | 0,- Ft |
+| Tranzakciós díj (tranzakciónként) | 7,- Ft |
+| Hálózati kapcsolat díja | 0,- Ft |
+| Forgalomarányos változó díj | 0,4 % |
+| Terminál használati díj | 2350,- Ft |
+
+*(A Fizetési Pont 2024. december 1-jétől hatályos hirdetménye szerint.)*
+
+**Nettó díjak, 27% ÁFA-kötelezettséggel.** A hirdetmény szerint:
+>Jogszabály alapján a fenti díjak esetében **áfa-felszámítási kötelezettség** keletkezhet.
+
+Ez a táblázat ötvözi a kétfajta díjköltséget. Vásárlásonként a `Tranzakciós díj` és a `Forgalomarányos változó díj` lesz levonva a vásárló által kifizetett **eredeti összegből**.
+
+**Példa:** 7 Ft + (59270 Ft * 0,004) = 7 Ft + 237,08 Ft = 244,08 Ft, amelyet kerekítünk: **244 Ft** a Fizetési Pont díja nettóban. **Bruttóban 310 Ft** (244 Ft * 1,27 = 309,88 Ft).
+
+**Végül 57786 Ft maradt a vállalkozásnak, összesen 1484 Ft-unkba került a vásárló bankkártyás fizetése a tranzakcióra vonatkozó díjtételek tekintetében.**
+
+Fontos: Előfordulhat, hogy a terminál-szolgáltató is olyan díjazást használ, amely kitér a különféle kártyatársaságok különféle kártyáinak szintjére is.
+
+#### A havi díj
+
+Minden egyes POS-terminál után ki kell fizetni az `Alapdíj`, `Hálózati kapcsolat díja`, valamint a `Terminál használati díj` díjtételeket.
+
+Egy terminál esetén a Fizetési Pont esetében: (0 Ft + 0 Ft + 2350 Ft) * 1 db terminál = 2350 Ft, **bruttó 2985 Ft**.
+
+Érdemes még a fix havi költségeket elosztani a havi tranzakciószámmal, és az így kapott összeget is hozzáadni a tranzakció tényleges díjához, hogy megkapjuk, pontosan mennyibe került. Például 100 darab kártyás vásárlás esetén **a valódi költség 29,85 Ft-tal nő, azaz 1514 Ft lesz, amivel 57756 Ft marad**.
+
+## Technikai részletek
+
+A programnak állnia kell egy fő JavaScript fájlból, amely a számítási logikát tartalmazza, valamint akár egy fájlon belül, de ha van rá lehetőség, különálló fájlokban későbbiekben lehetőséget kell adni predefined szolgáltatók díjazásainak
+tárolására. A feladatleírásból készítsd el az OFSZ és a Fizetési Pont díjszabását. Van néhány érték, amelyre nem tértem ki (pl. éves kártyadíj, havi számlavezetési díj), ezeknek hagyj kommentelve placeholder `0 Ft` értéket.
+
+A felhasználó megadja:
+- Melyik bank és mely terminál-szolgáltató díjazását szeretné használni
+- Éves szinten összesen hány vásárlás történt az egyes kártyatípusokkal
+
+A felhasználó ebből megkapja a kalkuláció eredményét:
+- A bank díjait részletezve
+- A terminál-szolgáltató díjait részletezve
+- A kettőből összesített összköltséget

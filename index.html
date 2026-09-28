@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bankkártya-elfogadási díjkalkulátor</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="tariffs.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="eyebrow">Vállalkozói kalkulátor</p>
+      <h1>Bankkártya-elfogadás költségei</h1>
+      <p class="intro">Havi forgalom alapján becsüld meg az OFSZ és a Fizetési Pont díjait.</p>
+    </header>
+
+    <section class="panel settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">Díjszabások</h2>
+      <div class="settings-grid">
+        <label>
+          Banki díjszabás
+          <select id="bank-provider" aria-describedby="provider-note"></select>
+        </label>
+        <label>
+          POS-szolgáltató
+          <select id="terminal-provider"></select>
+        </label>
+      </div>
+      <p class="note" id="provider-note">Jelenleg az OFSZ és a Fizetési Pont díjszabása érhető el. A kalkuláció minden tranzakcióra bankközi jutalékot számol.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="volume-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="volume-title">Havi kártyaforgalom</h2>
+          <p class="note">Add meg az egyes kártyatípusok havi tranzakciószámát és összértékét.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Kártyatípus</th>
+              <th scope="col">Bankközi díj</th>
+              <th scope="col">Tranzakciók / hó</th>
+              <th scope="col">Forgalom / hó (Ft)</th>
+            </tr>
+          </thead>
+          <tbody id="card-inputs"></tbody>
+        </table>
+      </div>
+      <p class="disclaimer">Az OFSZ díjtáblázatának egyedi kártyatípusai szerepelnek. A bankközi díjaknál a más bank által kibocsátott kártyák díjai érvényesülnek (worst case).</p>
+    </section>
+
+    <p class="error-message" id="calculation-error" role="alert" hidden></p>
+
+    <section class="results" id="results" aria-labelledby="results-title" aria-live="polite">
+      <h2 id="results-title">Becsült költségek</h2>
+      <div class="summary-grid">
+        <article class="summary-card">
+          <span class="summary-label">Összes költség havonta</span>
+          <strong id="monthly-total">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">A vállalkozásnál marad havonta</span>
+          <strong id="monthly-net">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">Összes költség évente</span>
+          <strong id="annual-total">—</strong>
+        </article>
+      </div>
+
+      <section class="panel result-panel" aria-labelledby="bank-results-title">
+        <h3 id="bank-results-title">Banki díjak havonta</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Kártyatípus</th>
+                <th scope="col">Kereskedői díj</th>
+                <th scope="col">Bankközi jutalék</th>
+                <th scope="col">Kártyatársasági díj</th>
+                <th scope="col">Összesen</th>
+              </tr>
+            </thead>
+            <tbody id="bank-results"></tbody>
+            <tfoot>
+              <tr>
+                <th scope="row" colspan="4">Banki díjak összesen</th>
+                <td id="bank-total">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="fixed-fees">
+          <span>Havi számlavezetési díj <small>(placeholder)</small></span><strong id="account-fee">—</strong>
+          <span>Éves kártyadíj <small>(placeholder)</small></span><strong id="card-fee">—</strong>
+        </div>
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="terminal-results-title">
+        <h3 id="terminal-results-title">Terminálszolgáltatói díjak havonta</h3>
+        <dl class="fee-list">
+          <dt>Tranzakciós díjak, nettó</dt><dd id="terminal-variable-net">—</dd>
+          <dt>ÁFA a tranzakciós díjakra</dt><dd id="terminal-variable-vat">—</dd>
+          <dt>Terminálhasználat, nettó</dt><dd id="terminal-fixed-net">—</dd>
+          <dt>ÁFA a terminálhasználatra</dt><dd id="terminal-fixed-vat">—</dd>
+          <dt class="fee-total">Termináldíjak összesen, bruttó</dt><dd class="fee-total" id="terminal-total">—</dd>
+        </dl>
+      </section>
+      <p class="disclaimer">A banki díjak tárgyi adómentesek. A Fizetési Pont nettó díjaira 27% ÁFA kerül. A százalékos díjak a havi összforgalomra, a fix tranzakciós díjak a tranzakciószámra számítódnak; a díjtételeket egész forintra kerekítjük. Éves becslésként a havi díjakat 12-vel szorozzuk.</p>
+    </section>
+  </main>
+</body>
+</html>
