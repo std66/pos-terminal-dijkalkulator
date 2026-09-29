@@ -13,7 +13,7 @@
     <header class="page-header">
       <p class="eyebrow">Vállalkozói kalkulátor</p>
       <h1>Bankkártya-elfogadás költségei</h1>
-      <p class="intro">Havi forgalom alapján becsüld meg a banki és terminálszolgáltatói díjakat.</p>
+      <p class="intro">Tranzakciós CSV alapján számítsd ki a banki és terminálszolgáltatói díjakat.</p>
     </header>
 
     <section class="panel settings" aria-labelledby="settings-title">
@@ -31,55 +31,49 @@
       <div class="provider-messages" id="provider-messages" aria-live="polite"></div>
     </section>
 
-    <section class="panel" aria-labelledby="volume-title">
-      <div class="section-heading">
-        <div>
-          <h2 id="volume-title">Havi kártyaforgalom</h2>
-          <p class="note">Add meg az egyes kártyatípusok havi tranzakciószámát és összértékét.</p>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Kártyatípus</th>
-              <th scope="col">Bankközi díj</th>
-              <th scope="col">Tranzakciók / hó</th>
-              <th scope="col">Forgalom / hó (Ft)</th>
-            </tr>
-          </thead>
-          <tbody id="card-inputs"></tbody>
-        </table>
-      </div>
-      <p class="disclaimer">A kalkuláció a kiválasztott bank díjszabásához tartozó feltevéseket és a megadott kártyatípusokat alkalmazza. A havi tranzakciószámnak és forgalomnak kártyatípusonként kell megadva lennie.</p>
+    <section class="panel" aria-labelledby="csv-title">
+      <h2 id="csv-title">Tranzakciós CSV</h2>
+      <p class="note">Válassz egy UTF-8 CSV-fájlt. Minden sor egy tranzakció legyen; az összeg egész forintban értendő.</p>
+      <label class="file-label" for="csv-file">CSV-fájl kiválasztása</label>
+      <input id="csv-file" type="file" accept=".csv,text/csv">
+      <p class="csv-format"><code>date,card_type,amount</code> — például <code>2026-09-01,vi_ret_db,59270</code></p>
+      <p class="disclaimer">Támogatott kártyakódok: <code>mc_ret_db</code>, <code>mc_ret_cr</code>, <code>vi_ret_db</code>, <code>vi_ret_cr</code>, <code>mc_bus_db</code>, <code>mc_bus_cr</code>, <code>vi_bus_db</code>, <code>vi_bus_cr</code>, <code>maestro</code>. A CSV fejlécének pontosan ezeket az oszlopokat kell tartalmaznia: <code>date,card_type,amount</code>. A havi fix termináldíj minden, a fájlban előforduló naptári hónapra felszámítódik.</p>
+      <p class="file-status" id="file-status" aria-live="polite"></p>
     </section>
 
     <p class="error-message" id="calculation-error" role="alert" hidden></p>
 
     <section class="results" id="results" aria-labelledby="results-title" aria-live="polite">
-      <h2 id="results-title">Becsült költségek</h2>
+      <h2 id="results-title">A CSV költségösszesítése</h2>
       <div class="summary-grid">
         <article class="summary-card">
-          <span class="summary-label">Összes költség havonta</span>
-          <strong id="monthly-total">—</strong>
+          <span class="summary-label">Tranzakciók száma</span>
+          <strong id="transaction-count">—</strong>
         </article>
         <article class="summary-card">
-          <span class="summary-label">A vállalkozásnál marad havonta</span>
-          <strong id="monthly-net">—</strong>
+          <span class="summary-label">CSV-forgalom</span>
+          <strong id="csv-turnover">—</strong>
         </article>
         <article class="summary-card">
-          <span class="summary-label">Összes költség évente</span>
-          <strong id="annual-total">—</strong>
+          <span class="summary-label">Összes díj a CSV időszakára</span>
+          <strong id="total-fees">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-label">Díjak után fennmaradó összeg</span>
+          <strong id="net-proceeds">—</strong>
         </article>
       </div>
+      <p class="note" id="period-summary"></p>
 
       <section class="panel result-panel" aria-labelledby="bank-results-title">
-        <h3 id="bank-results-title">Banki díjak havonta</h3>
+        <h3 id="bank-results-title">Banki díjak a CSV tranzakciói alapján</h3>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th scope="col">Kártyatípus</th>
+                <th scope="col">Tranzakciók</th>
+                <th scope="col">Forgalom</th>
                 <th scope="col">Kereskedői díj</th>
                 <th scope="col">Bankközi jutalék</th>
                 <th scope="col">Rendszerdíj</th>
@@ -89,29 +83,29 @@
             <tbody id="bank-results"></tbody>
             <tfoot>
               <tr>
-                <th scope="row" colspan="4">Banki díjak összesen</th>
+                <th scope="row" colspan="6">Banki díjak összesen</th>
                 <td id="bank-total">—</td>
               </tr>
             </tfoot>
           </table>
         </div>
         <div class="fixed-fees">
-          <span>Havi számlavezetési díj <small>(placeholder)</small></span><strong id="account-fee">—</strong>
+          <span>Számlavezetési díj <small>(érintett hónapok, placeholder)</small></span><strong id="account-fee">—</strong>
           <span>Éves kártyadíj <small>(placeholder)</small></span><strong id="card-fee">—</strong>
         </div>
       </section>
 
       <section class="panel result-panel" aria-labelledby="terminal-results-title">
-        <h3 id="terminal-results-title">Terminálszolgáltatói díjak havonta</h3>
+        <h3 id="terminal-results-title">Terminálszolgáltatói díjak a CSV időszakára</h3>
         <dl class="fee-list">
           <dt>Tranzakciós díjak, nettó</dt><dd id="terminal-variable-net">—</dd>
           <dt>ÁFA a tranzakciós díjakra</dt><dd id="terminal-variable-vat">—</dd>
-          <dt>Terminálhasználat, nettó</dt><dd id="terminal-fixed-net">—</dd>
-          <dt>ÁFA a terminálhasználatra</dt><dd id="terminal-fixed-vat">—</dd>
+          <dt>Havi fix díjak nettó (<span id="covered-months">0</span> hónap)</dt><dd id="terminal-fixed-net">—</dd>
+          <dt>ÁFA a havi fix díjakra</dt><dd id="terminal-fixed-vat">—</dd>
           <dt class="fee-total">Termináldíjak összesen, bruttó</dt><dd class="fee-total" id="terminal-total">—</dd>
         </dl>
       </section>
-      <p class="disclaimer">A banki díjak tárgyi adómentesek. A Fizetési Pont nettó díjaira 27% ÁFA kerül. A százalékos díjak a havi összforgalomra, a fix tranzakciós díjak a tranzakciószámra számítódnak; a díjtételeket egész forintra kerekítjük. Éves becslésként a havi díjakat 12-vel szorozzuk.</p>
+      <p class="disclaimer">A díjak tranzakciónként, a CSV-ben szereplő összegből számítódnak. A banki díjösszetevőket tranzakciónként egész forintra kerekítjük; a Fizetési Pont nettó tranzakciós díját is tranzakciónként kerekítjük, majd 27% ÁFÁ-t számítunk rá. A banki díjak tárgyi adómentesek. Az OTP 0,7%-os kereskedői díja tájékoztató példaérték.</p>
     </section>
   </main>
 </body>

@@ -103,6 +103,36 @@ input {
   font: inherit;
 }
 
+input[type="file"] {
+  min-height: auto;
+  padding: 10px;
+}
+
+.file-label {
+  margin-bottom: 8px;
+}
+
+.csv-format {
+  margin: 10px 0 0;
+  color: #60717d;
+  font-size: 12px;
+}
+
+.csv-format code,
+.disclaimer code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #f0f3f5;
+  color: #344a58;
+}
+
+.file-status {
+  margin: 12px 0 0;
+  color: #176b67;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 select:focus,
 input:focus {
   border-color: #168078;
@@ -204,7 +234,7 @@ td input.count-input {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 20px;
 }
@@ -297,5 +327,9 @@ tfoot td {
 @media (max-width: 800px) {
   .page {
     width: min(100% - 32px, 1120px);
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
