@@ -2,7 +2,7 @@ window.FEE_TARIFFS = {
   banks: {
     ofsz: {
       name: "O.F.SZ. Zrt.",
-      pricingModel: "Interchange Pass-Through",
+      pricingModel: "Költségalapú (IC++ jellegű)",
       merchantRate: 0.012,
       schemeFixed: 18,
       schemeRate: 0.0055,
@@ -23,13 +23,13 @@ window.FEE_TARIFFS = {
         { id: "visa-business-debit", csvType: "vi_bus_db", name: "Visa üzleti betéti", interchangeRate: 0.0135 },
         { id: "visa-business-credit", csvType: "vi_bus_cr", name: "Visa üzleti hitelkártya", interchangeRate: 0.0135 }
       ],
-      monthlyAccountFee: 0, // Placeholder: 0 Ft
-      annualCardFee: 0 // Placeholder: 0 Ft
+      monthlyAccountFee: 1751, // Placeholder: 0 Ft
+      annualCardFee: 7752 // Placeholder: 0 Ft
     },
     otp: {
       name: "OTP Bank",
       pricingModel: "Költségalapú (IC++ jellegű)",
-      merchantRate: 0.007,
+      merchantRate: 0.0099,
       messages: [
         {
           type: "info",
@@ -37,7 +37,7 @@ window.FEE_TARIFFS = {
         },
         {
           type: "warn",
-          text: "Az OTP kereskedői díja egyedi szerződéses; a számítás tájékoztató jelleggel a nyilvános példában szereplő 0,7%-ot használja."
+          text: "Az OTP kereskedői díja egyedi szerződéses; a számítás tájékoztató jelleggel a megadott 0,99%-ot használja."
         }
       ],
       cards: [
@@ -51,7 +51,7 @@ window.FEE_TARIFFS = {
         { id: "visa-business-debit", csvType: "vi_bus_db", name: "Visa üzleti betéti", interchangeRate: 0.0165, schemeFixed: 4.88, schemeRate: 0.001795 },
         { id: "visa-business-credit", csvType: "vi_bus_cr", name: "Visa üzleti hitelkártya", interchangeRate: 0.0165, schemeFixed: 4.90, schemeRate: 0.001845 }
       ],
-      monthlyAccountFee: 0, // Placeholder: 0 Ft
+      monthlyAccountFee: 6225, // Placeholder: 0 Ft
       annualCardFee: 0 // Placeholder: 0 Ft
     }
   },
@@ -69,6 +69,21 @@ window.FEE_TARIFFS = {
       baseMonthlyFee: 0,
       networkMonthlyFee: 0,
       terminalMonthlyFee: 2350,
+      vatRate: 0.27
+    },
+    simplepay: {
+      name: "SimplePay - Hordozható POS terminál",
+      messages: [
+        {
+          type: "info",
+          text: "A havi termináldíj 5 000 Ft nettó, amelyre 27% ÁFA kerül. Minden más megadott díj 0 Ft."
+        }
+      ],
+      transactionFixed: 0,
+      transactionRate: 0,
+      baseMonthlyFee: 0,
+      networkMonthlyFee: 0,
+      terminalMonthlyFee: 5000,
       vatRate: 0.27
     }
   }

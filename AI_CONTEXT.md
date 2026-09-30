@@ -28,10 +28,11 @@ Magyar kisvállalkozások számára készülő, szerver nélkül, `file://` prot
 - Az OTP saját kártyáit kizárjuk; kilenc CSV-kártyakód van a szűkített listában: Mastercard/Visa lakossági debit és credit, Mastercard/Visa üzleti debit és credit, továbbá lakossági Maestro.
 - OTP lakossági interchange feltevések: Mastercard debit 0,20%, credit 0,30%; Visa debit 0,20%, credit 0,30%; Maestro 0,20%.
 - OTP üzleti kártyák interchange feltevése: VISA és Mastercard debitre és creditre egyaránt 1,65%, a felhasználó kifejezett döntése alapján. Ez egyszerűsített becslés, nem minden üzleti termékszint worst-case értéke.
-- OTP kereskedői díj: 0,7%-os nyilvános példaérték; az OTP tényleges kereskedői díja egyedi szerződéses. A felület ezt figyelmeztető üzenetben jelzi.
+- OTP kereskedői díj aktuális feltevése: 0,99%, a felhasználó kifejezett kérése alapján; ez továbbra is tájékoztató, nem egyedi szerződéses ajánlat.
 - OTP rendszerdíjak a `otpbank.md` forintos, belföldi nem OTP kártyákra vonatkozó soraiból származnak. Ezek a táblázatban fix Ft/tranzakció + százalékos díjként szerepelnek.
 - Az OTP díjrendszer költségalapú / IC++ jellegű: kereskedői díj + bankközi jutalék + rendszerdíj.
 - A Fizetési Pont tranzakciós díja 7 Ft + a forgalom 0,4%-a; terminál havi díja 2350 Ft; a nettó POS-díjakra 27% ÁFA kerül.
+- A SimplePay hordozható POS konfiguráció havi díja 5 000 Ft nettó, 27% ÁFA-val; minden más megadott díjtétele 0 Ft. A havi fix díjat a CSV-ben előforduló különböző naptári hónapok szerint számolja a kalkulátor.
 - Havi számlavezetési és éves kártyadíjak egyelőre 0 Ft-os, kommentelt placeholderként szerepelnek.
 - Szolgáltatói tájékoztató üzenetek adatstruktúrája: `messages: [{ type: "info" | "warn", text: "..." }]`.
 
@@ -47,6 +48,7 @@ Magyar kisvállalkozások számára készülő, szerver nélkül, `file://` prot
 - A POS havi nettó fix díj és annak ÁFÁ-ja külön-külön egy hónapra kerekítődik, majd szorozva van a CSV-ben előforduló különböző hónapok számával.
 - A kártyasoronkénti `schemeFixed` és `schemeRate` lehetővé teszi az OTP rendszerdíjainak kártyánkénti eltérését; az OFSZ ezeket banki szinten határozza meg.
 - A kiválasztott bank és POS-szolgáltató `messages` elemei dinamikusan jelennek meg.
+- A POS-szolgáltatók között szerepel a `SimplePay - Hordozható POS terminál`; az OTP figyelmeztetése a 0,99%-os tájékoztató kereskedői díjat tünteti fel.
 - A banki eredménytábla oszlopának neve „Rendszerdíj”; az OFSZ kártyatársasági díja és az OTP rendszerdíja ugyanabban az oszlopban jelenik meg.
 - A bankválasztó a díjmodell nevét is mutatja (OFSZ: Interchange Pass-Through; OTP: költségalapú / IC++ jellegű).
 
@@ -56,12 +58,14 @@ Magyar kisvállalkozások számára készülő, szerver nélkül, `file://` prot
 - Node DOM-mock alapú végponttól végpontig teszt sikeresen ellenőrizte a CSV-importot BOM-mal, eltérő fejlécoszlop-sorrenddel, két naptári hónapot érintő adatokkal, OFSZ- és OTP-eredményekkel, szolgáltatói figyelmeztetésekkel és hibás dátum/kártyakód bemenetekkel.
 - Külön ellenőrzés igazolta, hogy a kilenc támogatott CSV-kártyakód mindkét bank tarifájában pontosan egyszer szerepel.
 - A tesztelt több hónapos példában 2026-09-01 `vi_ret_db` 59 270 Ft és 2026-10-02 `vi_bus_db` 100 000 Ft tranzakciók szerepeltek.
+- A SimplePay tarifát a felhasználó 5 000 Ft nettó havi díjjal és 27% ÁFA-val erősítette meg; az OTP példadíja 0,99%-ra módosult.
+- Az új OTP/SimplePay beállítás DOM-mock alapú ellenőrzése 59 270 Ft-os Visa debit tranzakcióval sikeres: az OTP kereskedői díj 587 Ft, a SimplePay havi díj nettó 5 000 Ft + 1 350 Ft ÁFA, a termináldíj összesen bruttó 6 350 Ft.
 
 ## Lehetséges következő ellenőrzések / nyitott megjegyzések
 
-- A kalkulátor becslés, nem hivatalos ajánlat. Az OTP 0,7%-os kereskedői díja és az üzleti kártyák 1,65%-os interchange értéke feltevésként van kezelve.
+- A kalkulátor becslés, nem hivatalos ajánlat. Az OTP 0,99%-os kereskedői díja és az üzleti kártyák 1,65%-os interchange értéke feltevésként van kezelve.
 - A `visa.md` EGT-n belüli, határon átnyúló díjtáblát, a `mastercard.md` magyarországi belföldi táblát tartalmaz. Az OTP-s egyszerűsített kalkuláció ezek díjait a rögzített feltevések szerint használja; a különböző kibocsátási régiók nincsenek a felületen modellezve.
 - A Visa üzleti táblázatban a Visa Business Debit/Credit Standard értéke 1,65%, de a Platinum és Infinite szintek ennél magasabbak. A Mastercard táblák sem garantálják, hogy minden termék általános Base díja 1,65%; ez a felhasználó által elfogadott egyszerűsítés.
-- A terminal provider választó jelenleg egy szolgáltatót tartalmaz. A banki modellválasztás és szolgáltatói üzenetek be vannak vezetve, de külön Blended/IC++ tarifacsomag-példák nincsenek felvéve.
+- A terminálszolgáltató-választóban a Fizetési Pont és a SimplePay szerepel. Külön Blended/IC++ tarifacsomag-példák nincsenek felvéve.
 - A CSV-lista nem tartalmazza a korábbi OFSZ-bemenetben szereplő V PAY-t, mert a felhasználó által megadott CSV-kódok között nincs hozzá kód.
 - A projektkönyvtár a munkamenet megkezdésekor nem volt Git repository.
